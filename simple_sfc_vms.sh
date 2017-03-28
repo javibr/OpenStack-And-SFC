@@ -1,16 +1,16 @@
 #!/bin/bash -e
 # Creates some instances for networking-sfc demo/development:
 # a web server, another instance to use as client
-# three "service VMs" with two interface that will just route the packets to/from each interface
+# three "service VMs" with two interfaces that will just route the packets to/from each interface
 
 . $(dirname "${BASH_SOURCE}")/custom.sh
 . $(dirname "${BASH_SOURCE}")/tools.sh
 
-# Disable port security (else packets would be rejected when exiting the service VMs)
+# Disable port security (This allow spoofing just to make possible the ip forwarding)
 openstack network set --disable-port-security private
 
-# Create network ports for all VMs
-for port in p1in p1out p2in p2out p3in p3out source_vm_port dest_vm_port
+# Create ports for all VMs
+for port in p1in p1out p2in p2out p3in p3out source_port dest_port
 do
     openstack port create --network private "${port}"
 done
@@ -31,10 +31,10 @@ openstack server create --image "${IMAGE}" --flavor "${FLAVOR}" \
 
 # Demo VMs
 openstack server create --image "${IMAGE}" --flavor "${FLAVOR}" \
-    --nic port-id="$(openstack port show -f value -c id source_vm_port)" \
+    --nic port-id="$(openstack port show -f value -c id source_port)" \
      source_vm
 openstack server create --image "${IMAGE}" --flavor "${FLAVOR}" \
-    --nic port-id="$(openstack port show -f value -c id dest_vm_port)" \
+    --nic port-id="$(openstack port show -f value -c id dest_port)" \
      dest_vm
 
 # Floating IPs
@@ -57,7 +57,7 @@ neutron flow-classifier-create \
     --destination-ip-prefix ${DEST_IP}/32 \
     --protocol tcp \
     --destination-port 80:80 \
-    --logical-source-port source_vm_port \
+    --logical-source-port source_port \
     FC_http
 
 # UDP flow classifier (catch all UDP traffic from source_vm to dest_vm, like traceroute)
@@ -66,7 +66,7 @@ neutron flow-classifier-create \
     --source-ip-prefix ${SOURCE_IP}/32 \
     --destination-ip-prefix ${DEST_IP}/32 \
     --protocol udp \
-    --logical-source-port source_vm_port \
+    --logical-source-port source_port \
     FC_udp
 
 # Get easy access to the VMs (single node)
