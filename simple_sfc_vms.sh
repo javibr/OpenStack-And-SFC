@@ -15,6 +15,16 @@ do
     openstack port create --network private "${port}"
 done
 
+# Create the port pairs for all 3 VMs
+neutron port-pair-create --ingress=p1in --egress=p1out PP1
+neutron port-pair-create --ingress=p2in --egress=p2out PP2
+neutron port-pair-create --ingress=p3in --egress=p3out PP3
+
+# And the port pair groups
+neutron port-pair-group-create --port-pair PP1 --port-pair PP2 PG1
+neutron port-pair-group-create --port-pair PP3 PG2
+
+
 # SFC VMs
 openstack server create --image "${IMAGE}" --flavor "${FLAVOR}" \
     --nic port-id="$(openstack port show -f value -c id p1in)" \
@@ -29,7 +39,6 @@ openstack server create --image "${IMAGE}" --flavor "${FLAVOR}" \
     --nic port-id="$(openstack port show -f value -c id p3out)" \
      vm3
 
-# Demo VMs
 openstack server create --image "${IMAGE}" --flavor "${FLAVOR}" \
     --nic port-id="$(openstack port show -f value -c id source_port)" \
      source_vm
@@ -48,7 +57,7 @@ for i in 1 2 3; do
     openstack server add floating ip vm${i} ${floating_ip}
 done
 
-# HTTP Flow classifier (catch the web traffic from source_vm to dest_vm)
+# HTTP Flow classifier (web traffic from source to destination)
 SOURCE_IP=$(openstack port show source_vm_port -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 DEST_IP=$(openstack port show dest_vm_port -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 neutron flow-classifier-create \
@@ -60,7 +69,7 @@ neutron flow-classifier-create \
     --logical-source-port source_port \
     FC_http
 
-# UDP flow classifier (catch all UDP traffic from source_vm to dest_vm, like traceroute)
+# UDP flow classifier (UDP traffic)
 neutron flow-classifier-create \
     --ethertype IPv4 \
     --source-ip-prefix ${SOURCE_IP}/32 \
@@ -70,22 +79,13 @@ neutron flow-classifier-create \
     FC_udp
 
 # Get easy access to the VMs (single node)
-route_to_subnetpool
-
-# Create the port pairs for all 3 VMs
-neutron port-pair-create --ingress=p1in --egress=p1out PP1
-neutron port-pair-create --ingress=p2in --egress=p2out PP2
-neutron port-pair-create --ingress=p3in --egress=p3out PP3
-
-# And the port pair groups
-neutron port-pair-group-create --port-pair PP1 --port-pair PP2 PG1
-neutron port-pair-group-create --port-pair PP3 PG2
+VM_route
 
 # The complete chain
 neutron port-chain-create --port-pair-group PG1 --port-pair-group PG2 --flow-classifier FC_udp --flow-classifier FC_http PC1
 
 # Start a basic demo web server
-ssh cirros@${DEST_FLOATING} 'while true; do echo -e "HTTP/1.0 200 OK\r\n\r\nWelcome to $(hostname)" | sudo nc -l -p 80 ; done&'
+ssh cirros@${DEST_FLOATING} 'while true; do echo -e "HTTP/1.0 200 OK\r\n\r\nWelcome to my home" | sudo nc -l -p 80 ; done&'
 
 # On service VMs, enable eth1 interface and add static routing
 for i in 1 2 3
@@ -94,8 +94,8 @@ do
     ssh -T cirros@${!ip_name} <<EOF
 sudo sh -c 'echo "auto eth1" >> /etc/network/interfaces'
 sudo sh -c 'echo "iface eth1 inet dhcp" >> /etc/network/interfaces'
-sudo /etc/init.d/S40network restart
 sudo sh -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'
+sudo /etc/init.d/S40network restart
 sudo ip route add ${SOURCE_IP} dev eth0
 sudo ip route add ${DEST_IP} dev eth1
 
