@@ -3,7 +3,7 @@
 # a web server, another instance to use as client
 # three "service VMs" with two interfaces that will just route the packets to/from each interface
 
-. $(dirname "${BASH_SOURCE}")/custom.sh
+. $(dirname "${BASH_SOURCE}")/options.sh
 . $(dirname "${BASH_SOURCE}")/tools.sh
 
 # Disable port security (This allow spoofing just to make possible the ip forwarding)
