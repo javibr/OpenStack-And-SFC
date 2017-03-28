@@ -9,6 +9,10 @@
 
 # Else use local key (will be generated if it does not exist)
 SSH_KEYNAME="default"
+# Use nano or tiny flavor
+FLAVOR=m1.nano
+# Cirros image modified with tcpdump
+IMAGE=disk-1
 
 # Source credentials (devstack, packstack, tripleo)
 PROJECT="demo" # tripleo uses admin project
@@ -24,7 +28,7 @@ elif [[ -e ~/overcloudrc ]]; then
     source ~/overcloudrc
     openstack network show public 2>/dev/null || $(dirname "${BASH_SOURCE}")/overcloud_basic_setup.sh
 else
-    echo "Could not find any credentials file"
+    echo "Problem retrieving credentials file"
     exit 1
 fi
 
@@ -32,7 +36,6 @@ fi
 FLAVOR=m1.nano
 # Find cirros image
 IMAGE=disk-1
-
 
 # Note: check on existing rules is basic
 SECGROUP=$(openstack security group list -f value -c ID --project admin 2> /dev/null || echo default)
