@@ -49,5 +49,5 @@ do
     if ! echo "${SECGROUP_RULES}" | grep -q "port_range_max='${port}', port_range_min='${port}'"
     then
         openstack security group rule create --proto tcp --dst-port ${port} "${SECGROUP}"
-    fi
+    fi 
 done
