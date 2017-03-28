@@ -1,9 +1,8 @@
 #!/bin/bash -e
 # Common functions
 
-function route_to_subnetpool {
-    # Neutron no longer sets route to the created net:
-    # https://github.com/openstack-dev/devstack/commit/1493bdeba24674f6634160d51b8081c571df4017
+function VM_route {
+   
     # Add/replace it here for ease of use
     local ROUTER=$(openstack router list -f value -c ID)
     # No router
