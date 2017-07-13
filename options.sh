@@ -22,6 +22,7 @@ if [[ -e ~/devstack/openrc ]]; then
 elif [[ -e ~/keystonerc_${PROJECT} ]]; then
     echo "Sourcing packstack ${PROJECT} credentials"
     source ~/keystonerc_${PROJECT}
+#Do not mind this case    
 elif [[ -e ~/overcloudrc ]]; then
     echo "Sourcing overcloud credentials"
     echo "WARNING: not fully suppported yet"
