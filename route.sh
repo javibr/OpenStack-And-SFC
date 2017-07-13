@@ -1,5 +1,6 @@
 #!/bin/bash -e
-# Common functions
+#Credits to the great man that discovered this s****
+
 
 function VM_route {
    
