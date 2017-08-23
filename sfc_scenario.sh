@@ -15,16 +15,6 @@ do
     openstack port create --network private "${port}"
 done
 
-# Create the port pairs for all 3 VMs
-neutron port-pair-create --ingress=p1in --egress=p1out PP1
-neutron port-pair-create --ingress=p2in --egress=p2out PP2
-neutron port-pair-create --ingress=p3in --egress=p3out PP3
-
-# And the port pair groups
-neutron port-pair-group-create --port-pair PP1 --port-pair PP2 PG1
-neutron port-pair-group-create --port-pair PP3 PG2
-
-
 # SFC VMs
 openstack server create --image "${IMAGE}" --flavor "${FLAVOR}" \
     --nic port-id="$(openstack port show -f value -c id p1in)" \
@@ -56,6 +46,15 @@ for i in 1 2 3; do
     declare VM${i}_FLOATING=${floating_ip}
     openstack server add floating ip vm${i} ${floating_ip}
 done
+
+# Create the port pairs for all 3 VMs
+neutron port-pair-create --ingress=p1in --egress=p1out PP1
+neutron port-pair-create --ingress=p2in --egress=p2out PP2
+neutron port-pair-create --ingress=p3in --egress=p3out PP3
+
+# And the port pair groups
+neutron port-pair-group-create --port-pair PP1 --port-pair PP2 PG1
+neutron port-pair-group-create --port-pair PP3 PG2
 
 # HTTP Flow classifier (web traffic from source to destination)
 SOURCE_IP=$(openstack port show source_vm_port -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
