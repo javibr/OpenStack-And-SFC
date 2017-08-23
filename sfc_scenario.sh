@@ -57,8 +57,8 @@ neutron port-pair-group-create --port-pair PP1 --port-pair PP2 PG1
 neutron port-pair-group-create --port-pair PP3 PG2
 
 # HTTP Flow classifier (web traffic from source to destination)
-SOURCE_IP=$(openstack port show source_vm_port -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-DEST_IP=$(openstack port show dest_vm_port -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+SOURCE_IP=$(openstack port show source_port -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+DEST_IP=$(openstack port show dest_port -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 neutron flow-classifier-create \
     --ethertype IPv4 \
     --source-ip-prefix ${SOURCE_IP}/32 \
