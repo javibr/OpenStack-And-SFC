@@ -1,7 +1,8 @@
 # OpenStack-scripts
 A serie of openstack scripts to deploy easy scenarios
 
-This scneario create two VMs source and destination and 3 Functions, distributed in a group of two and one as we can see below
+All these scripts belong to a final thesis named "SERVICE FUNCTION CHAINING EN NFV: EVALUACIÓN PRÁCTICA CON OPENSTACK"
+
 
 
    
