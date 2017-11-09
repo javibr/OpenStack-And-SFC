@@ -10,7 +10,7 @@ First of all, you need an Ubuntu 14.04 server (16 can suits too), the resources 
 
 To deploy OpenStack, you need to follow my thesis (it is attached as tfg_JavierBautista), after all the problems you will encounter (because you will), try to run the script sfc_scenario.sh, it will deploy the first scenario of the thesis, play around with it until you break everything, but do not worry, we are playing in a virtual environment ;)
 
-Everytime you want to deploy a new scenario, it is neccesary to do an ```[bash] unstack.sh```.
+Everytime you want to deploy a new scenario, it is neccesary to do an ```unstack.sh```.
 
 # What is Service Function Chaining
 
@@ -18,4 +18,4 @@ SFC is a new architecture which allows the packets to flow along the network dep
 
 ![A picture of SFC](https://www.sdxcentral.com/wp-content/uploads/2016/02/MKT2014097243EN_fig03.jpg)
 
-If you are still intereste in what you saw, I encourage you to take a look to my thesis.
+If you are still interested in what you have seen, I encourage you to take a look to my thesis.
